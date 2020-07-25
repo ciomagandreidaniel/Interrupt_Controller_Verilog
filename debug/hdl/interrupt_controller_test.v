@@ -3,8 +3,10 @@ module interrupt_controller_test;
 
 wire clk;
 wire rst_n;
-wire [3:0]irq_request;
-wire interrupt;
+wire [3:0] irq_request;
+wire   interrupt;
+
+
 
 interrupt_controller
  i_interrupt_controller(

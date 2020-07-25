@@ -1,66 +1,189 @@
 //checking the rising edge pulse detector
 
 module interrupt_controller(
-input       pclk_i,
-input       rst_n_i,
-input       [3:0] irq_request_i,
-output       interrupt_o
+
+//APB Interface
+input               pclk_i         ,
+input               penable_i      ,
+input               psel_i         ,
+input               pwrite_i       ,
+input      [31:0]   paddr_i       ,
+input      [31:0]   pwdata_i       ,
+output reg [31:0]   prdata_o       ,
+output              pready_o       ,
+output              pslverr_o      ,
+
+
+//interrupt controller
+             
+input               rst_n_i        ,
+input               enable_o       ,
+input      [3:0]    irq_request_i  ,
+output              interrupt_o
 );
 
 
-reg [3:0] status;
+
+
+
+wire apb_write = psel_i & penable_i & pwrite_i;
+wire apb_read  = psel_i & ~pwrite_i;
+
+//status
+//--------------------------------------------------------------
+reg status_0;
+reg status_1;
+reg status_2;
+reg status_3;
+
+wire [3:0] status; // address 1
+//--------------------------------------------------------------
+
+//clear
+//--------------------------------------------------------------
+reg [3:0] clear ; // address 2
+//--------------------------------------------------------------
+
+//mask
+//--------------------------------------------------------------
+reg mask_0;
+reg mask_1;
+reg mask_2;
+reg mask_3;
+
+wire [3:0] mask; // address 1
+//--------------------------------------------------------------
 
 
 
 
-//status register
+//--------------------------------------------------------------
+// Status Register
+//--------------------------------------------------------------
+
+//status_0 
 always @(posedge pclk_i or negedge rst_n_i)
 begin
  if(~rst_n_i) 
   begin
-   status      <= 4'b0000;
+   status_0      <= 1'b0;
   end
- else 
+  else if(enable_o)
   begin
-    case (irq_request_i)
-	 4'b0001 : begin status [0] <= 1'b1; end
-	 4'b0010 : begin status [1] <= 1'b1; end
-	 4'b0011 : begin status [0] <= 1'b1;
-	                 status [1] <= 1'b1; end
-	 4'b0100 : begin status [2] <= 1'b1; end
-	 4'b0101 : begin status [0] <= 1'b1;
-	                 status [2] <= 1'b1; end
-	 4'b0110 : begin status [1] <= 1'b1;
-	                 status [2] <= 1'b1; end
-	 4'b0111 : begin status [0] <= 1'b1;
-	                 status [1] <= 1'b1;
-					 status [2] <= 1'b1; end
-	 4'b1000 : begin status [3] <= 1'b1; end
-	 4'b1001 : begin status [0] <= 1'b1;
-	                 status [3] <= 1'b1; end
-     4'b1010 : begin status [1] <= 1'b1;
-                     status [3] <= 1'b1; end
-	 4'b1011 : begin status [0] <= 1'b1;
-	                 status [1] <= 1'b1;
-					 status [3] <= 1'b1; end
-	 4'b1100 : begin status [2] <= 1'b1;
-	                 status [3] <= 1'b1; end
-	 4'b1101 : begin status [0] <= 1'b1;
-	                 status [2] <= 1'b1;
-					 status [3] <= 1'b1; end
-	 4'b1110 : begin status [1] <= 1'b1;
-	                 status [2] <= 1'b1;
-					 status [3] <= 1'b1; end
-	 4'b1111 : begin status [0] <= 1'b1;
-	                 status [1] <= 1'b1;
-	                 status [2] <= 1'b1;
-					 status [3] <= 1'b1; end
-	endcase
+   if(clear[0])
+    begin
+     status_0 <= 1'b0;
+    end	
+    else if(irq_request_i[0])
+    begin
+     status_0 <= 1'b1;
+    end
+   end   
+end
+
+//status_1 
+always @(posedge pclk_i or negedge rst_n_i)
+begin
+ if(~rst_n_i) 
+  begin
+   status_1      <= 1'b0;
+  end
+  else if(enable_o)
+  begin
+   if(clear[1])
+    begin
+     status_1 <= 1'b0;
+    end	
+    else if(irq_request_i[1])
+    begin
+     status_1 <= 1'b1;
+    end
+   end   
+end
+
+//status_2 
+always @(posedge pclk_i or negedge rst_n_i)
+begin
+ if(~rst_n_i) 
+  begin
+   status_2      <= 1'b0;
+  end
+  else if(enable_o)
+  begin
+   if(clear[2])
+    begin
+     status_2 <= 1'b0;
+    end	
+    else if(irq_request_i[2])
+    begin
+     status_2 <= 1'b1;
+    end
+   end   
+end
+
+//status_3 
+always @(posedge pclk_i or negedge rst_n_i)
+begin
+ if(~rst_n_i) 
+  begin
+   status_3      <= 1'b0;
+  end
+  else if(enable_o)
+  begin
+   if(clear[3])
+    begin
+     status_3 <= 1'b0;
+    end	
+    else if(irq_request_i[3])
+    begin
+     status_3 <= 1'b1;
+    end
+   end   
+end
+
+assign status = {status_3,status_2,status_1,status_0};
+
+//--------------------------------------------------------------
+
+
+
+//--------------------------------------------------------------
+// Clear Register
+//--------------------------------------------------------------
+
+always @(posedge pclk_i or negedge rst_n_i)
+begin
+ if(~rst_n_i)
+  clear <= {4{1'b0}};
+ else if (enable)
+  begin
+   if(apb_write & (paddr_i == 'd2))
+    begin
+	 clear <= pwdata_i[3:0];
+	end
+   else
+     clear <= {4{1'b0}};
   end
 end
 
- assign  interrupt_o      = 1'b0;
+//--------------------------------------------------------------
 
+//--------------------------------------------------------------
+// Mask Register
+//--------------------------------------------------------------
+
+always @(posedge pclk_i or negedge rst_n_i)
+
+
+
+assign mask = {mask_3,mask_2,mask_1,mask_0}; 
+
+//--------------------------------------------------------------
+
+ assign  interrupt_o      = 1'b0;//|(mask & status);
+ 
+ assign pready  = 1'b1;
+ assign pslverr = 1'b0;
 
 
 endmodule
