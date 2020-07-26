@@ -1,4 +1,4 @@
-//checking the rising edge pulse detector
+
 
 module interrupt_controller(
 
@@ -18,8 +18,8 @@ output              pslverr_o      ,
              
 input               rst_n_i        ,
 input               enable_o       ,
-input      [3:0]    irq_request_i  ,
-output              interrupt_o
+input      [3:0]    irq_trigger_i  ,
+output reg          interrupt_o
 );
 
 
@@ -51,7 +51,7 @@ reg mask_1;
 reg mask_2;
 reg mask_3;
 
-wire [3:0] mask; // address 1
+wire [3:0] mask; // address 3
 //--------------------------------------------------------------
 
 
@@ -74,7 +74,7 @@ begin
     begin
      status_0 <= 1'b0;
     end	
-    else if(irq_request_i[0])
+    else if(irq_trigger_i[0])
     begin
      status_0 <= 1'b1;
     end
@@ -94,7 +94,7 @@ begin
     begin
      status_1 <= 1'b0;
     end	
-    else if(irq_request_i[1])
+    else if(irq_trigger_i[1])
     begin
      status_1 <= 1'b1;
     end
@@ -114,7 +114,7 @@ begin
     begin
      status_2 <= 1'b0;
     end	
-    else if(irq_request_i[2])
+    else if(irq_trigger_i[2])
     begin
      status_2 <= 1'b1;
     end
@@ -134,7 +134,7 @@ begin
     begin
      status_3 <= 1'b0;
     end	
-    else if(irq_request_i[3])
+    else if(irq_trigger_i[3])
     begin
      status_3 <= 1'b1;
     end
@@ -155,7 +155,7 @@ always @(posedge pclk_i or negedge rst_n_i)
 begin
  if(~rst_n_i)
   clear <= {4{1'b0}};
- else if (enable)
+ else if (enable_o)
   begin
    if(apb_write & (paddr_i == 'd2))
     begin
@@ -172,18 +172,100 @@ end
 // Mask Register
 //--------------------------------------------------------------
 
+//mask_0
 always @(posedge pclk_i or negedge rst_n_i)
+begin
+ if(~rst_n_i) 
+  mask_0 <= 1'b0;
+ else if(enable_o)
+ begin
+      if(clear[0])
+      mask_0 <= 1'b0;	  
+ else if(apb_write & (paddr_i == 'd3))
+      mask_0 <= pwdata_i [0];
+ end
+end
 
+//mask_1
+always @(posedge pclk_i or negedge rst_n_i)
+begin
+ if(~rst_n_i) 
+  mask_1 <= 1'b0;
+ else if(enable_o)
+ begin
+      if(clear[1])
+      mask_1 <= 1'b0;	  
+ else if(apb_write & (paddr_i == 'd3))
+      mask_1 <= pwdata_i [1];
+ end
+end
 
+//mask_2
+always @(posedge pclk_i or negedge rst_n_i)
+begin
+ if(~rst_n_i) 
+  mask_2 <= 1'b0;
+ else if(enable_o)
+ begin
+      if(clear[2])
+      mask_2 <= 1'b0;	  
+ else if(apb_write & (paddr_i == 'd3))
+      mask_2 <= pwdata_i [2];
+ end
+end
+
+//mask_3
+always @(posedge pclk_i or negedge rst_n_i)
+begin
+ if(~rst_n_i) 
+  mask_3 <= 1'b0;
+ else if(enable_o)
+ begin
+      if(clear[3])
+      mask_3 <= 1'b0;	  
+ else if(apb_write & (paddr_i == 'd3))
+      mask_3 <= pwdata_i [3];
+ end
+end
 
 assign mask = {mask_3,mask_2,mask_1,mask_0}; 
 
 //--------------------------------------------------------------
 
- assign  interrupt_o      = 1'b0;//|(mask & status);
+//--------------------------------------------------------------
+// prdata_o
+//--------------------------------------------------------------
+
+always @(posedge pclk_i or negedge rst_n_i)
+begin
+ if(~rst_n_i)
+  prdata_o <= {32{1'b0}};
+ else if (enable_o)
+  begin
+   if(apb_read & (paddr_i == 'd1))
+   prdata_o [4:0] <= status; 
+  end
+end
+
+//--------------------------------------------------------------
+
+//--------------------------------------------------------------
+// interrupt_o
+//--------------------------------------------------------------
+
+
+always @(posedge pclk_i or negedge rst_n_i)
+begin
+ if(~rst_n_i)
+  interrupt_o <= 1'b0;
+ else if (enable_o)
+  interrupt_o      <= |(mask & status);
+end
  
- assign pready  = 1'b1;
- assign pslverr = 1'b0;
+//--------------------------------------------------------------
+ 
+ assign pready_o  = 1'b1;
+ assign pslverr_o = 1'b0;
 
 
 endmodule
