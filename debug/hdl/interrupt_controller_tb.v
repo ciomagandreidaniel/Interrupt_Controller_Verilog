@@ -32,7 +32,7 @@ irq_pulse(4'b0010);
 @(posedge pclk_o);
 irq_pulse(4'b0001);
 @(posedge pclk_o);
-apb_write('d2, 'b1111);
+apb_write('d2, 'b0010);
 @(posedge pclk_o);
    
 
