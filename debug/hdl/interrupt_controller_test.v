@@ -18,7 +18,7 @@ wire   interrupt;
 
 
 
-interrupt_controller_v2
+interrupt_controller
  i_interrupt_controller(
   .pclk_i(pclk),
   .penable_i(penable),
