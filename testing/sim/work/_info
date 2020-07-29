@@ -1,0 +1,73 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dC:/Users/cioma/Desktop/EasyIC Internship/Interrupt_Controller_Verilog/testing/sim
+vdcpirq
+!s110 1596034365
+!i10b 1
+!s100 LJPOXeJ6j7:TbN9OW<aYQ3
+IWaZ7_ZmkIMk6;Vm;mI7aK3
+Z1 VDg1SIo80bB@j0V0VzS_@n1
+R0
+w1596034354
+8C:/Users/cioma/Desktop/EasyIC Internship/Interrupt_Controller_Verilog/testing/hdl under test/dcpirq.v
+FC:/Users/cioma/Desktop/EasyIC Internship/Interrupt_Controller_Verilog/testing/hdl under test/dcpirq.v
+L0 1
+Z2 OP;L;10.4a;61
+r1
+!s85 0
+31
+!s108 1596034365.000000
+!s107 C:/Users/cioma/Desktop/EasyIC Internship/Interrupt_Controller_Verilog/testing/hdl under test/dcpirq.v|
+!s90 -reportprogress|300|-work|work|C:/Users/cioma/Desktop/EasyIC Internship/Interrupt_Controller_Verilog/testing/hdl under test/dcpirq.v|
+!s101 -O0
+!i113 1
+Z3 o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact -O0
+vdcpirq_tb
+!s110 1596033283
+!i10b 1
+!s100 74DI]9gT]Obz3ZYh@DZBM2
+Ilz]7[^FD>lQI2?0<Pg?4k1
+R1
+R0
+w1596033272
+8C:/Users/cioma/Desktop/EasyIC Internship/Interrupt_Controller_Verilog/testing/hdl under test/dcpirq_tb.v
+FC:/Users/cioma/Desktop/EasyIC Internship/Interrupt_Controller_Verilog/testing/hdl under test/dcpirq_tb.v
+L0 1
+R2
+r1
+!s85 0
+31
+!s108 1596033283.000000
+!s107 C:/Users/cioma/Desktop/EasyIC Internship/Interrupt_Controller_Verilog/testing/hdl under test/dcpirq_tb.v|
+!s90 -reportprogress|300|-work|work|C:/Users/cioma/Desktop/EasyIC Internship/Interrupt_Controller_Verilog/testing/hdl under test/dcpirq_tb.v|
+!s101 -O0
+!i113 1
+R3
+vdcpirq_test
+!s110 1596030919
+!i10b 1
+!s100 T`_<_W?l8DW4m`a[_bl_j2
+ICDzOC[[5b4^2nQW8aV1NL3
+R1
+R0
+w1596030387
+8C:/Users/cioma/Desktop/EasyIC Internship/Interrupt_Controller_Verilog/testing/hdl under test/dcpirq_test.v
+FC:/Users/cioma/Desktop/EasyIC Internship/Interrupt_Controller_Verilog/testing/hdl under test/dcpirq_test.v
+L0 1
+R2
+r1
+!s85 0
+31
+!s108 1596030919.000000
+!s107 C:/Users/cioma/Desktop/EasyIC Internship/Interrupt_Controller_Verilog/testing/hdl under test/dcpirq_test.v|
+!s90 -reportprogress|300|-work|work|C:/Users/cioma/Desktop/EasyIC Internship/Interrupt_Controller_Verilog/testing/hdl under test/dcpirq_test.v|
+!s101 -O0
+!i113 1
+R3
