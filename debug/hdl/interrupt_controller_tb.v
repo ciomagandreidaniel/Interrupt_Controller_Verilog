@@ -26,14 +26,12 @@ irq_trigger_o <= {4{1'b0}};
 @(posedge pclk_o);
 @(posedge pclk_o);
 
-apb_write('d3, 'd1);
+apb_write('d9, 'd2);
+
 @(posedge pclk_o);
-irq_pulse(4'b0010);
+irq_pulse(4'b0100);
 @(posedge pclk_o);
-irq_pulse(4'b0001);
-@(posedge pclk_o);
-apb_write('d2, 'b0010);
-@(posedge pclk_o);
+
    
 
    

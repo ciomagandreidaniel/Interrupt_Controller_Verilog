@@ -19,158 +19,146 @@ input               enable_o       ,
 
 //interrupt controller
 input      [3:0]    irq_trigger_i  ,
-output              interrupt_o
+output reg          interrupt_o    ,
+output reg [1:0]    irq_address
 );
 
-//testing
-reg reg_interrupt;
-wire wire_interrupt;
 
 //apb command signals
 wire apb_write = psel_i & penable_i & pwrite_i;
 wire apb_read  = psel_i & ~pwrite_i;
 
+//priority threshold
+reg [2:0] priority_threshold; //0x09
 
-//status
+//interrupt request registers
+reg [2:0] irq_reg_0;
+reg [2:0] irq_reg_1;
+reg [2:0] irq_reg_2;
+reg [2:0] irq_reg_3;
+
+//interrupt acknowledge
+wire        ack_irq;
+
+//interrupt request line
+wire       irq_line;
+
+//interrupt request output lines
+wire irq_out_0;
+wire irq_out_1;
+wire irq_out_2;
+wire irq_out_3;
+
+
+
 //--------------------------------------------------------------
-reg [3:0] status; // address 1
+// irq_reg_0
 //--------------------------------------------------------------
 
-//clear
-//--------------------------------------------------------------
-reg [3:0] clear ; // address 2
-//--------------------------------------------------------------
-
-//mask
-//--------------------------------------------------------------
-reg [3:0] mask; // address 3
-//--------------------------------------------------------------
-
-
-
-
-//--------------------------------------------------------------
-// Status Register
-//--------------------------------------------------------------
-/*
 always @(posedge pclk_i or negedge rst_n_i)
-begin
- if(~rst_n_i)
-  status <= {4{1'b0}};
- else if(enable_o)
+begin 
+if(~rst_n_i)
  begin
+  irq_reg_0 <= 3'b000;
+ end
+else if(enable_o)
+ begin
+   if(irq_trigger_i[0])
+    irq_reg_0[0] <= 1'b1;
+   if(ack_irq) 
+    irq_reg_0[1] <= 1'b1;
+   if(irq_reg_0[1] & (~irq_reg_0[0]))
+    irq_reg_0[2] <= 1'b1;
+ end
+end
+
+//--------------------------------------------------------------
+
+//--------------------------------------------------------------
+// irq_reg_1
+//--------------------------------------------------------------
+
+always @(posedge pclk_i or negedge rst_n_i)
+begin 
+if(~rst_n_i)
+ begin
+  irq_reg_1 <= 3'b000;
+ end
+else if(enable_o)
+ begin
+   if(irq_trigger_i[1])
+    irq_reg_1[0] <= 1'b1;
+   if(irq_reg_0[2]) 
+    irq_reg_1[1] <= 1'b1;
+   if(irq_reg_1[1] & (~irq_reg_1[0]))
+    irq_reg_1[2] <= 1'b1;	
+ end
+end
+
  
-  case({clear[0],irq_trigger_i[0]})
-  
-   2'b01   : status[0] <= 1'b1;
-   2'b10   : status[0] <= 1'b0;
-   2'b11   : status[0] <= 1'b0;
-   default : status[0] <= status[0];
-  endcase
-  
-    case({clear[1],irq_trigger_i[1]})
-  
-   2'b01   : status[1] <= 1'b1;
-   2'b10   : status[1] <= 1'b0;
-   2'b11   : status[1] <= 1'b0;
-   default : status[1] <= status[1];
-  endcase
-  
-    case({clear[2],irq_trigger_i[2]})
-  
-   2'b01   : status[2] <= 1'b1;
-   2'b10   : status[2] <= 1'b0;
-   2'b11   : status[2] <= 1'b0;
-   default : status[2] <= status[2];
-  endcase
-  
-    case({clear[3],irq_trigger_i[3]})
-  
-   2'b01   : status[3] <= 1'b1;
-   2'b10   : status[3] <= 1'b0;
-   2'b11   : status[3] <= 1'b0;
-   default : status[3] <= status[3];
-  endcase
-  
- end
+//--------------------------------------------------------------
 
-end
-*/
+//--------------------------------------------------------------
+// irq_reg_2
+//--------------------------------------------------------------
 
 always @(posedge pclk_i or negedge rst_n_i)
-begin
- if(~rst_n_i)
-  status <= {4{1'b0}};
- else if(enable_o)
+begin 
+if(~rst_n_i)
  begin
- status <= (clear != 0) ? (status & (~clear)) : (status | irq_trigger_i);
-
+  irq_reg_2 <= 3'b000;
  end
-end
-
-
-
-//--------------------------------------------------------------
-
-
-
-//--------------------------------------------------------------
-// Clear Register
-//--------------------------------------------------------------
-
-always @(posedge pclk_i or negedge rst_n_i)
-begin
- if(~rst_n_i)
-  clear <= {4{1'b0}};
- else if (enable_o)
-  begin
-   if(apb_write & (paddr_i == 'd2))
-    begin
-	 clear <= pwdata_i[3:0];
-	end
-   else
-     clear <= {4{1'b0}};
-  end
-end
-
-//--------------------------------------------------------------
-
-//--------------------------------------------------------------
-// Mask Register
-//--------------------------------------------------------------
-
-
-always @(posedge pclk_i or negedge rst_n_i)
-begin
- if(~rst_n_i) 
-  mask <= 1'b0;
- else if(enable_o)
+else if(enable_o)
  begin
- if(apb_write & (paddr_i == 'd3))
-      mask <= pwdata_i [3:0];
+   if(irq_trigger_i[2])
+    irq_reg_2[0] <= 1'b1;
+   if(irq_reg_1[2]) 
+    irq_reg_2[1] <= 1'b1;
+   if(irq_reg_2[1] & (~irq_reg_2[0]))
+    irq_reg_2[2] <= 1'b1;	
  end
 end
 
+ 
 //--------------------------------------------------------------
 
 //--------------------------------------------------------------
-// prdata_o
+// irq_reg_3
 //--------------------------------------------------------------
 
 always @(posedge pclk_i or negedge rst_n_i)
-begin
- if(~rst_n_i)
-  prdata_o <= {32{1'b0}};
- else if (enable_o)
-  begin
-        if(apb_read & (paddr_i == 'd1))
-   prdata_o [4:0] <= status;
-   else if(apb_read & (paddr_i == 'd2))
-   prdata_o [4:0] <= clear;
-   else if(apb_read & (paddr_i == 'd3))
-   prdata_o [4:0] <= mask;   
-  end
+begin 
+if(~rst_n_i)
+ begin
+  irq_reg_3 <= 3'b000;
+ end
+else if(enable_o)
+ begin
+   if(irq_trigger_i[3])
+    irq_reg_3[0] <= 1'b1;
+   if(irq_reg_2[2]) 
+    irq_reg_3[1] <= 1'b1;
+   if(irq_reg_3[1] & (~irq_reg_3[0]))
+    irq_reg_3[2] <= 1'b1;	
+ end
 end
+
+ 
+//--------------------------------------------------------------
+
+//--------------------------------------------------------------
+// ack_irq
+//--------------------------------------------------------------
+
+assign ack_irq = irq_line;
+
+//--------------------------------------------------------------
+
+//--------------------------------------------------------------
+// irq_line
+//--------------------------------------------------------------
+
+assign irq_line = irq_reg_0[0] | irq_reg_1[0] | irq_reg_2[0] | irq_reg_3[0];
 
 //--------------------------------------------------------------
 
@@ -178,22 +166,66 @@ end
 // interrupt_o
 //--------------------------------------------------------------
 
+assign irq_out_0 = irq_reg_0[0] &  irq_reg_0[1];
+assign irq_out_1 = irq_reg_1[0] &  irq_reg_1[1];
+assign irq_out_2 = irq_reg_2[0] &  irq_reg_2[1];
+assign irq_out_3 = irq_reg_3[0] &  irq_reg_3[1];
+
+					
 always @(posedge pclk_i or negedge rst_n_i)
 begin
  if(~rst_n_i)
-  reg_interrupt <= 1'b0;
- else if (enable_o)
-  reg_interrupt      <= |(mask & status);
-end
-
-assign wire_interrupt = |(mask & status);
-
-assign interrupt_o =  reg_interrupt &  wire_interrupt;
+   interrupt_o = 1'b0;
+ else if(enable_o)
+   interrupt_o <=  ((priority_threshold >= 'd1) & irq_out_0) | 
+                   ((priority_threshold >= 'd2) & irq_out_1) | 
+				   ((priority_threshold >= 'd3) & irq_out_2) | 
+				   ((priority_threshold >= 'd4) & irq_out_3) ;
+end 
 
 //--------------------------------------------------------------
- 
+
+//--------------------------------------------------------------
+// irq_address
+//--------------------------------------------------------------
+
+always @(posedge pclk_i or negedge rst_n_i)
+begin
+ if(~rst_n_i) irq_address <= 2'b00;
+ else if (enable_o)
+  begin
+   if(irq_reg_0[1] & irq_reg_0[0])
+       irq_address <= 2'b00;
+   else if(irq_reg_1[1] & irq_reg_1[0])
+       irq_address <= 2'b01;
+   else if(irq_reg_2[1] & irq_reg_2[0])
+       irq_address <= 2'b10;
+   else if(irq_reg_3[1] & irq_reg_3[0])
+       irq_address <= 2'b11;
+  end
+end
+
+//--------------------------------------------------------------
+
+//--------------------------------------------------------------
+// priority_threshold
+//--------------------------------------------------------------
+
+always @(posedge pclk_i or negedge rst_n_i)
+begin
+ if(~rst_n_i) priority_threshold <= 3'b100;
+ else if (enable_o)
+ begin
+  if(apb_write & (paddr_i == 'd9))
+     priority_threshold <= pwdata_i[3:0];
+ end
+             
+end
+
+//--------------------------------------------------------------
+
  assign pready_o  = 1'b1;
  assign pslverr_o = 1'b0;
 
 
-endmodule
+endmodule //interrupt_controller_v2

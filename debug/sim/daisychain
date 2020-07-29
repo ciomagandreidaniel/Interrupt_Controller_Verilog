@@ -1,0 +1,30 @@
+onerror {resume}
+quietly WaveActivateNextPane {} 0
+add wave -noupdate -radix binary /interrupt_controller_test/i_interrupt_controller/pclk_i
+add wave -noupdate -radix binary -childformat {{{/interrupt_controller_test/i_interrupt_controller/irq_trigger_i[3]} -radix binary} {{/interrupt_controller_test/i_interrupt_controller/irq_trigger_i[2]} -radix binary} {{/interrupt_controller_test/i_interrupt_controller/irq_trigger_i[1]} -radix binary} {{/interrupt_controller_test/i_interrupt_controller/irq_trigger_i[0]} -radix binary}} -expand -subitemconfig {{/interrupt_controller_test/i_interrupt_controller/irq_trigger_i[3]} {-height 15 -radix binary} {/interrupt_controller_test/i_interrupt_controller/irq_trigger_i[2]} {-height 15 -radix binary} {/interrupt_controller_test/i_interrupt_controller/irq_trigger_i[1]} {-height 15 -radix binary} {/interrupt_controller_test/i_interrupt_controller/irq_trigger_i[0]} {-height 15 -radix binary}} /interrupt_controller_test/i_interrupt_controller/irq_trigger_i
+add wave -noupdate -radix binary -childformat {{{/interrupt_controller_test/i_interrupt_controller/irq_reg_0[2]} -radix binary} {{/interrupt_controller_test/i_interrupt_controller/irq_reg_0[1]} -radix binary} {{/interrupt_controller_test/i_interrupt_controller/irq_reg_0[0]} -radix binary}} -expand -subitemconfig {{/interrupt_controller_test/i_interrupt_controller/irq_reg_0[2]} {-height 15 -radix binary} {/interrupt_controller_test/i_interrupt_controller/irq_reg_0[1]} {-height 15 -radix binary} {/interrupt_controller_test/i_interrupt_controller/irq_reg_0[0]} {-height 15 -radix binary}} /interrupt_controller_test/i_interrupt_controller/irq_reg_0
+add wave -noupdate -radix binary -childformat {{{/interrupt_controller_test/i_interrupt_controller/irq_reg_1[2]} -radix binary} {{/interrupt_controller_test/i_interrupt_controller/irq_reg_1[1]} -radix binary} {{/interrupt_controller_test/i_interrupt_controller/irq_reg_1[0]} -radix binary}} -expand -subitemconfig {{/interrupt_controller_test/i_interrupt_controller/irq_reg_1[2]} {-height 15 -radix binary} {/interrupt_controller_test/i_interrupt_controller/irq_reg_1[1]} {-height 15 -radix binary} {/interrupt_controller_test/i_interrupt_controller/irq_reg_1[0]} {-height 15 -radix binary}} /interrupt_controller_test/i_interrupt_controller/irq_reg_1
+add wave -noupdate -radix binary -childformat {{{/interrupt_controller_test/i_interrupt_controller/irq_reg_2[2]} -radix binary} {{/interrupt_controller_test/i_interrupt_controller/irq_reg_2[1]} -radix binary} {{/interrupt_controller_test/i_interrupt_controller/irq_reg_2[0]} -radix binary}} -expand -subitemconfig {{/interrupt_controller_test/i_interrupt_controller/irq_reg_2[2]} {-height 15 -radix binary} {/interrupt_controller_test/i_interrupt_controller/irq_reg_2[1]} {-height 15 -radix binary} {/interrupt_controller_test/i_interrupt_controller/irq_reg_2[0]} {-height 15 -radix binary}} /interrupt_controller_test/i_interrupt_controller/irq_reg_2
+add wave -noupdate -radix binary -childformat {{{/interrupt_controller_test/i_interrupt_controller/irq_reg_3[2]} -radix binary} {{/interrupt_controller_test/i_interrupt_controller/irq_reg_3[1]} -radix binary} {{/interrupt_controller_test/i_interrupt_controller/irq_reg_3[0]} -radix binary}} -expand -subitemconfig {{/interrupt_controller_test/i_interrupt_controller/irq_reg_3[2]} {-height 15 -radix binary} {/interrupt_controller_test/i_interrupt_controller/irq_reg_3[1]} {-height 15 -radix binary} {/interrupt_controller_test/i_interrupt_controller/irq_reg_3[0]} {-height 15 -radix binary}} /interrupt_controller_test/i_interrupt_controller/irq_reg_3
+add wave -noupdate -radix binary /interrupt_controller_test/i_interrupt_controller/irq_line
+add wave -noupdate -radix binary /interrupt_controller_test/i_interrupt_controller/interrupt_o
+add wave -noupdate -radix binary /interrupt_controller_test/i_interrupt_controller/irq_address
+add wave -noupdate -radix binary /interrupt_controller_test/i_interrupt_controller/ack_irq
+TreeUpdate [SetDefaultTree]
+WaveRestoreCursors {{Cursor 1} {65 ns} 0}
+quietly wave cursor active 1
+configure wave -namecolwidth 150
+configure wave -valuecolwidth 100
+configure wave -justifyvalue left
+configure wave -signalnamewidth 1
+configure wave -snapdistance 10
+configure wave -datasetprefix 0
+configure wave -rowmargin 4
+configure wave -childrowmargin 2
+configure wave -gridoffset 0
+configure wave -gridperiod 1
+configure wave -griddelta 40
+configure wave -timeline 0
+configure wave -timelineunits ns
+update
+WaveRestoreZoom {0 ns} {1 us}
