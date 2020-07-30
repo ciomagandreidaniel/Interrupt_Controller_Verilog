@@ -19,7 +19,7 @@ input               enable_o       ,
 
 //interrupt controller
 input      [3:0]    irq_trigger_i  ,
-output reg          interrupt_o    ,
+output              interrupt_o    ,
 output reg [1:0]    irq_address
 );
 
@@ -49,7 +49,12 @@ wire irq_out_1;
 wire irq_out_2;
 wire irq_out_3;
 
+//clear registers
+reg [3:0] clear; //0x08
 
+//interrupt controller output
+reg reg_interrupt;
+wire wire_interrupt;
 
 //--------------------------------------------------------------
 // irq_reg_0
@@ -63,12 +68,20 @@ if(~rst_n_i)
  end
 else if(enable_o)
  begin
+   if(|clear)
+     begin
+     irq_reg_0[2:1] <= 2'b0;
+	 irq_reg_0[0]   <= irq_reg_0[0] & (~clear[0]);
+	 end
+   else 
+   begin
    if(irq_trigger_i[0])
     irq_reg_0[0] <= 1'b1;
    if(ack_irq) 
     irq_reg_0[1] <= 1'b1;
    if(irq_reg_0[1] & (~irq_reg_0[0]))
     irq_reg_0[2] <= 1'b1;
+	end
  end
 end
 
@@ -86,12 +99,20 @@ if(~rst_n_i)
  end
 else if(enable_o)
  begin
+   if(|clear)
+     begin
+     irq_reg_1[2:1] <= 2'b0;
+	 irq_reg_1[0]   <= irq_reg_1[0] & (~clear[1]);
+	 end
+   else 
+   begin
    if(irq_trigger_i[1])
     irq_reg_1[0] <= 1'b1;
    if(irq_reg_0[2]) 
     irq_reg_1[1] <= 1'b1;
    if(irq_reg_1[1] & (~irq_reg_1[0]))
-    irq_reg_1[2] <= 1'b1;	
+    irq_reg_1[2] <= 1'b1;
+   end	
  end
 end
 
@@ -110,12 +131,20 @@ if(~rst_n_i)
  end
 else if(enable_o)
  begin
+   if(|clear)
+     begin
+     irq_reg_2[2:1] <= 2'b0;
+	 irq_reg_2[0]   <= irq_reg_2[0] & (~clear[2]);
+	 end
+   else 
+   begin
    if(irq_trigger_i[2])
     irq_reg_2[0] <= 1'b1;
    if(irq_reg_1[2]) 
     irq_reg_2[1] <= 1'b1;
    if(irq_reg_2[1] & (~irq_reg_2[0]))
-    irq_reg_2[2] <= 1'b1;	
+    irq_reg_2[2] <= 1'b1;
+   end	
  end
 end
 
@@ -134,12 +163,20 @@ if(~rst_n_i)
  end
 else if(enable_o)
  begin
+   if(|clear)
+     begin
+     irq_reg_3[2:1] <= 2'b0;
+	 irq_reg_3[0]   <= irq_reg_3[0] & (~clear[3]);
+	 end
+   else 
+   begin
    if(irq_trigger_i[3])
     irq_reg_3[0] <= 1'b1;
    if(irq_reg_2[2]) 
     irq_reg_3[1] <= 1'b1;
    if(irq_reg_3[1] & (~irq_reg_3[0]))
-    irq_reg_3[2] <= 1'b1;	
+    irq_reg_3[2] <= 1'b1;
+   end	
  end
 end
 
@@ -175,13 +212,20 @@ assign irq_out_3 = irq_reg_3[0] &  irq_reg_3[1];
 always @(posedge pclk_i or negedge rst_n_i)
 begin
  if(~rst_n_i)
-   interrupt_o = 1'b0;
+   reg_interrupt = 1'b0;
  else if(enable_o)
-   interrupt_o <=  ((priority_threshold >= 'd1) & irq_out_0) | 
+   reg_interrupt <=  ((priority_threshold >= 'd1) & irq_out_0) | 
                    ((priority_threshold >= 'd2) & irq_out_1) | 
 				   ((priority_threshold >= 'd3) & irq_out_2) | 
 				   ((priority_threshold >= 'd4) & irq_out_3) ;
 end 
+
+assign wire_interrupt = ((priority_threshold >= 'd1) & irq_out_0) | 
+                        ((priority_threshold >= 'd2) & irq_out_1) | 
+				        ((priority_threshold >= 'd3) & irq_out_2) | 
+				        ((priority_threshold >= 'd4) & irq_out_3) ;
+						
+assign interrupt_o =  reg_interrupt &  wire_interrupt;
 
 //--------------------------------------------------------------
 
@@ -220,6 +264,27 @@ begin
      priority_threshold <= pwdata_i[3:0];
  end
              
+end
+
+//--------------------------------------------------------------
+
+//--------------------------------------------------------------
+// Clear Register
+//--------------------------------------------------------------
+
+always @(posedge pclk_i or negedge rst_n_i)
+begin
+ if(~rst_n_i)
+  clear <= {4{1'b0}};
+ else if (enable_o)
+  begin
+   if(apb_write & (paddr_i == 'd8))
+    begin
+	 clear <= pwdata_i[3:0];
+	end
+   else
+     clear <= {4{1'b0}};
+  end
 end
 
 //--------------------------------------------------------------

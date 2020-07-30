@@ -10,8 +10,9 @@ add wave -noupdate -radix binary /interrupt_controller_test/i_interrupt_controll
 add wave -noupdate -radix binary /interrupt_controller_test/i_interrupt_controller/interrupt_o
 add wave -noupdate -radix binary /interrupt_controller_test/i_interrupt_controller/irq_address
 add wave -noupdate -radix binary /interrupt_controller_test/i_interrupt_controller/ack_irq
+add wave -noupdate /interrupt_controller_test/i_interrupt_controller/clear
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {65 ns} 0}
+WaveRestoreCursors {{Cursor 1} {53 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
@@ -27,4 +28,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ns} {1 us}
+WaveRestoreZoom {0 ns} {463 ns}
