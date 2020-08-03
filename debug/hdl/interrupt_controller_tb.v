@@ -1,4 +1,17 @@
-
+//-----------------------------------------------------------------------------------------------------
+// S.C EASYIC DESIGN S.R.L
+// Project     : Interrupt Controller with APB Interface
+// Module      : interrupt_controller_tb
+// Author      : Ciomag Andrei Daniel(CAD)
+// Date        : 26.07.2020
+//-----------------------------------------------------------------------------------------------------
+// Description : This module has the role of generating control signals for checking and debugging the
+// interrupt_controller module.  
+//-----------------------------------------------------------------------------------------------------
+// Updates     :
+// 26.07.2020    (CAD): Initial
+// 03.08.2020    (CAD): Update 2 
+//-----------------------------------------------------------------------------------------------------
 
 module interrupt_controller_tb(
 output reg            pclk_o          ,
@@ -15,34 +28,25 @@ output reg            enable_o
 
 initial begin
 
-paddr_o       <= {32{1'b0}};
-pwrite_o      <= 1'b0;
-psel_o        <= 1'b0;
-penable_o     <= 1'b0;
-pwdata_o      <= {32{1'b0}};
+apb_init;
 irq_trigger_o <= {4{1'b0}};
 
 @(posedge pclk_o);
 @(posedge pclk_o);
 @(posedge pclk_o);
 
-//apb_write('d9, 'd2);
-
-@(posedge pclk_o);
-irq_pulse(4'b1100);
-@(posedge pclk_o);
-@(posedge pclk_o);
-@(posedge pclk_o);
-@(posedge pclk_o);
-@(posedge pclk_o);
-@(posedge pclk_o);
-@(posedge pclk_o);
-@(posedge pclk_o);
+apb_write('d4, 'd2);     // write to priority threschold register
+apb_write('d5, 'd1);     // write to irq0_reg
+apb_write('d6, 'd1);     // write to irq1_reg
+apb_write('d7, 'd3);     // write to irq2_reg
+apb_write('d8, 'd3);     // write to irq3_reg
+apb_write('d3,'b0010);   // write to mask register
+   
 @(posedge pclk_o);
 @(posedge pclk_o);
 
-apb_write('d8,'b0100);   
-
+irq_pulse('b1111);
+@(posedge pclk_o);
    
 end
 
@@ -54,6 +58,7 @@ task irq_pulse;
 input [3:0] irq;
 
 begin
+$display ("%g Interrupt request pulses: %b", $time, irq);
 irq_trigger_o <= irq;
 @(posedge pclk_o);
 irq_trigger_o <= {4{1'b0}};
@@ -69,9 +74,11 @@ endtask
 
 task apb_read;
 
+input [31:0] address;
 
 begin
-paddr_o   <= 'd1;
+$display ("%g APB read from %d address", $time, address);
+paddr_o   <= address;
 pwrite_o  <= 1'b0;
 psel_o    <= 1'b1;
 @(posedge pclk_o);
@@ -79,6 +86,7 @@ penable_o <= 1'b1;
 @(posedge pclk_o);
 psel_o    <= 1'b0;
 penable_o <= 1'b0;
+@(posedge pclk_o);
 end
 
 
@@ -97,6 +105,7 @@ input [31:0] address;
 input [31:0] data;
 
 begin
+$display ("%g APB write %d to %d address", $time, data[7:0], address);
 paddr_o   <= address;
 pwdata_o  <= data;
 pwrite_o  <= 1'b1;
@@ -106,6 +115,26 @@ penable_o <= 1'b1;
 @(posedge pclk_o);
 psel_o    <= 1'b0;
 penable_o <= 1'b0;
+@(posedge pclk_o);
+end
+
+endtask
+
+//--------------------------------------------------------------
+
+//--------------------------------------------------------------
+// Initiate APB task
+//--------------------------------------------------------------
+
+task apb_init;
+
+begin
+$display ("%g Initiate APB", $time);
+paddr_o       <= {32{1'b0}};
+pwrite_o      <= 1'b0;
+psel_o        <= 1'b0;
+penable_o     <= 1'b0;
+pwdata_o      <= {32{1'b0}};
 end
 
 endtask

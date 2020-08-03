@@ -215,9 +215,9 @@ begin
    reg_interrupt = 1'b0;
  else if(enable_o)
    reg_interrupt <=  ((priority_threshold >= 'd1) & irq_out_0) | 
-                   ((priority_threshold >= 'd2) & irq_out_1) | 
-				   ((priority_threshold >= 'd3) & irq_out_2) | 
-				   ((priority_threshold >= 'd4) & irq_out_3) ;
+                     ((priority_threshold >= 'd2) & irq_out_1) | 
+				     ((priority_threshold >= 'd3) & irq_out_2) | 
+				     ((priority_threshold >= 'd4) & irq_out_3) ;
 end 
 
 assign wire_interrupt = ((priority_threshold >= 'd1) & irq_out_0) | 

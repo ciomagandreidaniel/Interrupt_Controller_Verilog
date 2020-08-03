@@ -13,14 +13,13 @@ wire [31:0] prdata;
 wire pready;
 wire pslverr;
 
-wire [1:0] irq_address;
 
 wire [3:0] irq_trigger;
 wire   interrupt;
 
 
 
-interrupt_controller_v2
+interrupt_controller
  i_interrupt_controller(
   .pclk_i(pclk),
   .penable_i(penable),
@@ -34,8 +33,7 @@ interrupt_controller_v2
   .rst_n_i(rst_n),
   .enable_o(enable),
   .irq_trigger_i(irq_trigger),
-  .interrupt_o(interrupt),
-  .irq_address(irq_address)
+  .interrupt_o(interrupt)
 );
 
 
