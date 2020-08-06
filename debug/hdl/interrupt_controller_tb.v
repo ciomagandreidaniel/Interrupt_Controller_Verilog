@@ -14,6 +14,7 @@
 //-----------------------------------------------------------------------------------------------------
 
 module interrupt_controller_tb(
+input                 interrupt_i     ,
 output reg            pclk_o          ,
 output reg            rst_n_o         ,
 output reg            penable_o       ,
@@ -26,6 +27,40 @@ output reg            enable_o
 );
 
 
+//--------------------------------------------------------------
+// Random Transaction Generator Task
+//--------------------------------------------------------------
+
+task tr_gen;
+
+input [3:0] irq_p;
+input [3:0] mask;
+input [2:0] pth;
+input [2:0] ir0;
+input [2:0] ir1;
+input [2:0] ir2;
+input [2:0] ir3;
+
+
+begin
+apb_write('d2, 'b1111);        // clear status register
+apb_write('d4, pth);           // write to priority threschold register
+apb_write('d5, ir0);           // write to irq0_reg
+apb_write('d6, ir1);           // write to irq1_reg
+apb_write('d7, ir2);           // write to irq2_reg
+apb_write('d8, ir3);           // write to irq3_reg
+apb_write('d3,mask);           // write to mask register
+@(posedge pclk_o);
+irq_pulse(irq_p);
+@(posedge pclk_o);
+end
+
+endtask
+
+//--------------------------------------------------------------
+// Initiate Testing
+//--------------------------------------------------------------
+
 initial begin
 
 apb_init;
@@ -34,21 +69,18 @@ irq_trigger_o <= {4{1'b0}};
 @(posedge pclk_o);
 @(posedge pclk_o);
 @(posedge pclk_o);
-
-apb_write('d4, 'd2);     // write to priority threschold register
-apb_write('d5, 'd1);     // write to irq0_reg
-apb_write('d6, 'd1);     // write to irq1_reg
-apb_write('d7, 'd3);     // write to irq2_reg
-apb_write('d8, 'd3);     // write to irq3_reg
-apb_write('d3,'b0010);   // write to mask register
-   
+tr_gen('b1010, 'b1000, 'd1, {$random % 5},{$random} % 5, {$random} %5, {$random} % 5);
 @(posedge pclk_o);
 @(posedge pclk_o);
-
-irq_pulse('b1111);
+@(posedge pclk_o);
+//tr_gen('b1110, 'b0100);
+@(posedge pclk_o);
 @(posedge pclk_o);
    
 end
+
+//--------------------------------------------------------------
+
 
 //--------------------------------------------------------------
 // Interrupt requests pulses task

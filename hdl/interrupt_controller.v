@@ -8,10 +8,25 @@
 // Description : Interrupt Controller with APB Interface is a module that is used to combine 
 // several sources of interrupt into one single line, allowing priority levels to the interrupt
 // input lines. The controller registers are configured via the AMBA 3 APB Protocol. 
+//----------------------------------------------------------------------------------------------------- 
+// Wave forms example
+//                  __    __    __    __    __    __    __    __
+//         pclk_o__|  |__|  |__|  |__|  |__|  |__|  |__|  |__|  
+//                        _____
+//  irq_wires[0]_________|     |_______________________________
+//                              ________________
+//     status[0]_______________|                |______________
+//                 ____________________________________________
+//       mask[0]__|                                            
+//                                   ___________
+//   interrupt_o____________________|           |______________
+//                                         _____
+//      clear[0]__________________________|     |______________
 //-----------------------------------------------------------------------------------------------------
 // Updates     :
 // 26.07.2020    (CAD): Initial
-// 28.07.2020    (CAD): Update 3 
+// 28.07.2020    (CAD): Update 1
+// 02.08.2020    (CAD): Update 2 
 //-----------------------------------------------------------------------------------------------------
 
 module interrupt_controller(
@@ -38,7 +53,7 @@ input      [3:0]    irq_trigger_i  ,
 output              interrupt_o
 );
 
-//testing
+//for interrupt_o signal to set 0 after clear pulse
 reg reg_interrupt;
 wire wire_interrupt;
 
@@ -71,7 +86,7 @@ reg [2:0] priority_threshold; // address 0x04
 
 
 
-//interrupt request registers
+//interrupt request priority registers
 //--------------------------------------------------------------
 reg [2:0] irq0_reg;// address 0x05
 reg [2:0] irq1_reg;// address 0x06                                        
@@ -81,11 +96,12 @@ reg [2:0] irq3_reg;// address 0x08
 
 //interrupt request wires 
 //--------------------------------------------------------------
-wire [3:0]  irq_wires;//testing
+wire [3:0]  irq_wires;//interrupt requests that have a set 
+                      //priority below the priority threshold
 //-------------------------------------------------------------- 
 
 //--------------------------------------------------------------
-// Priotiry Threshold Register
+// Priority Threshold Register
 //--------------------------------------------------------------
 
 always @(posedge pclk_i or negedge rst_n_i)
@@ -116,64 +132,18 @@ assign irq_wires[3] = irq_trigger_i[3] & (irq3_reg <= priority_threshold);
 // Status Register
 //--------------------------------------------------------------
 
+
 always @(posedge pclk_i or negedge rst_n_i)
 begin
  if(~rst_n_i)
   status <= {4{1'b0}};
  else if(enable_o)
  begin
- 
-    case({clear[0],irq_wires[0]})
-  
-   2'b01   : status[0] <= 1'b1;
-   2'b10   : status[0] <= 1'b0;
-   2'b11   : status[0] <= 1'b0;
-   default : status[0] <= status[0];
-  endcase
-  
-    case({clear[1],irq_wires[1]})
-  
-   2'b01   : status[1] <= 1'b1;
-   2'b10   : status[1] <= 1'b0;
-   2'b11   : status[1] <= 1'b0;
-   default : status[1] <= status[1];
-  endcase
-  
-    case({clear[2],irq_wires[2]})
-  
-   2'b01   : status[2] <= 1'b1;
-   2'b10   : status[2] <= 1'b0;
-   2'b11   : status[2] <= 1'b0;
-   default : status[2] <= status[2];
-  endcase
-  
-    case({clear[3],irq_wires[3]})
-  
-   2'b01   : status[3] <= 1'b1;
-   2'b10   : status[3] <= 1'b0;
-   2'b11   : status[3] <= 1'b0;
-   default : status[3] <= status[3];
-  endcase
-  
- end
-
-end
-
-
-//liviu 
-
-/*
-always @(posedge pclk_i or negedge rst_n_i)
-begin
- if(~rst_n_i)
-  status <= {4{1'b0}};
- else if(enable_o)
- begin
- status <= (clear != 0) ? (status & (~clear)) : (status | irq_trigger_i);
+ status <= (clear != 0) ? (status & (~clear)) : (status | irq_wires);
 
  end
 end
-*/
+
 
 
 //--------------------------------------------------------------
@@ -220,7 +190,7 @@ end
 //--------------------------------------------------------------
 
 //--------------------------------------------------------------
-// interrupt request registers
+// Interrupt Request Priority registers
 //--------------------------------------------------------------
 
 //irq0_reg
@@ -274,7 +244,7 @@ end
 //--------------------------------------------------------------
 
 //--------------------------------------------------------------
-// prdata_o
+// prdata_o (read function)
 //--------------------------------------------------------------
 
 always @(posedge pclk_i or negedge rst_n_i)
@@ -322,10 +292,8 @@ assign interrupt_o =  reg_interrupt &  wire_interrupt;
 
 //--------------------------------------------------------------
  
- assign pready_o  = 1'b1;
- assign pslverr_o = 1'b0;
+ assign pready_o  = 1'b1;// no need to extend the APB transfer
+ assign pslverr_o = 1'b0;// APB peripherials are not required to support the 
+                         // PSLVERR pin, so it is tied LOW
  
-
-
-
 endmodule //interrupt_controller

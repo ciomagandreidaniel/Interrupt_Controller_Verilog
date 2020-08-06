@@ -40,6 +40,7 @@ interrupt_controller
 
 interrupt_controller_tb
  i_interrupt_controller_tb(
+  .interrupt_i(interrupt),
   .pclk_o(pclk),
   .rst_n_o(rst_n),
   .penable_o(penable),
