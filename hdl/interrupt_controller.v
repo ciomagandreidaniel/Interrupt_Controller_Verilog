@@ -11,7 +11,7 @@
 //----------------------------------------------------------------------------------------------------- 
 // Wave forms example
 //                  __    __    __    __    __    __    __    __
-//         pclk_o__|  |__|  |__|  |__|  |__|  |__|  |__|  |__|  
+//        pclk_o___|  |__|  |__|  |__|  |__|  |__|  |__|  |__|  
 //                        _____
 //  irq_wires[0]_________|     |_______________________________
 //                              ________________
@@ -107,7 +107,7 @@ wire [3:0]  irq_wires;//interrupt requests that have a set
 always @(posedge pclk_i or negedge rst_n_i)
 begin
  if (~rst_n_i) priority_threshold <= 3'b100; else
- if (enable_o) begin if (apb_write & (paddr_i == 'd4))
+ if (enable_o) begin if (apb_write & (paddr_i == 'h4))
                priority_threshold <= pwdata_i[2:0];
                end 
 end
@@ -160,7 +160,7 @@ begin
   clear <= {4{1'b0}};
  else if (enable_o)
   begin
-   if(apb_write & (paddr_i == 'd2))
+   if(apb_write & (paddr_i == 'h2))
     begin
 	 clear <= pwdata_i[3:0];
 	end
@@ -182,7 +182,7 @@ begin
   mask <= 1'b0;
  else if(enable_o)
  begin
- if(apb_write & (paddr_i == 'd3))
+ if(apb_write & (paddr_i == 'h3))
       mask <= pwdata_i [3:0];
  end
 end
@@ -190,7 +190,7 @@ end
 //--------------------------------------------------------------
 
 //--------------------------------------------------------------
-// Interrupt Request Priority registers
+// Interrupt Request Priority Registers
 //--------------------------------------------------------------
 
 //irq0_reg
@@ -200,7 +200,7 @@ if(~rst_n_i)
  irq0_reg <= 3'b001;
 else if(enable_o)
  begin
-  if(apb_write & (paddr_i == 'd5))
+  if(apb_write & (paddr_i == 'h5))
    irq0_reg <= pwdata_i[2:0];
  end
 end
@@ -212,7 +212,7 @@ if(~rst_n_i)
  irq1_reg <= 3'b001;
 else if(enable_o)
  begin
-  if(apb_write & (paddr_i == 'd6))
+  if(apb_write & (paddr_i == 'h6))
    irq1_reg <= pwdata_i[2:0];
  end
 end
@@ -224,7 +224,7 @@ if(~rst_n_i)
  irq2_reg <= 3'b001;
 else if(enable_o)
  begin
-  if(apb_write & (paddr_i == 'd7))
+  if(apb_write & (paddr_i == 'h7))
    irq2_reg <= pwdata_i[2:0];
  end
 end
@@ -236,7 +236,7 @@ if(~rst_n_i)
  irq3_reg <= 3'b001;
 else if(enable_o)
  begin
-  if(apb_write & (paddr_i == 'd8))
+  if(apb_write & (paddr_i == 'h8))
    irq3_reg <= pwdata_i[2:0];
  end
 end
@@ -253,21 +253,21 @@ begin
   prdata_o <= {32{1'b0}};
  else if (enable_o)
   begin
-        if(apb_read & (paddr_i == 'd1))
+        if(apb_read & (paddr_i == 'h1))
           prdata_o [3:0] <= status;             //read status register
-   else if(apb_read & (paddr_i == 'd2))
+   else if(apb_read & (paddr_i == 'h2))
           prdata_o [3:0] <= clear;              //read clear register
-   else if(apb_read & (paddr_i == 'd3))
+   else if(apb_read & (paddr_i == 'h3))
           prdata_o [3:0] <= mask;               //read mask register
-   else if(apb_read & (paddr_i == 'd4))
+   else if(apb_read & (paddr_i == 'h4))
           prdata_o [2:0] <= priority_threshold; //read priority threshold register
-   else if(apb_read & (paddr_i == 'd5))
+   else if(apb_read & (paddr_i == 'h5))
           prdata_o [2:0] <= irq0_reg;           //read interrupt request 0 register
-   else if(apb_read & (paddr_i == 'd6))
+   else if(apb_read & (paddr_i == 'h6))
           prdata_o [2:0] <= irq1_reg;           //read interrupt request 1 register
-   else if(apb_read & (paddr_i == 'd7))
+   else if(apb_read & (paddr_i == 'h7))
           prdata_o [2:0] <= irq2_reg;           //read interrupt request 2 register
-   else if(apb_read & (paddr_i == 'd8))
+   else if(apb_read & (paddr_i == 'h8))
           prdata_o [2:0] <= irq3_reg;           //read interrupt request 3 register
   end
 end

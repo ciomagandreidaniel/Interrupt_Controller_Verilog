@@ -69,8 +69,13 @@ irq_trigger_o <= {4{1'b0}};
 @(posedge pclk_o);
 @(posedge pclk_o);
 @(posedge pclk_o);
-tr_gen('b1010, 'b1000, 'd1, {$random % 5},{$random} % 5, {$random} %5, {$random} % 5);
+//enable_o <= 1'b0;
+tr_gen('b1001, 'b0001, 'd2, 'd1,'d2,'d3,'d4);
+
 @(posedge pclk_o);
+apb_read('d3);
+apb_read('d1);
+apb_read('d6);
 @(posedge pclk_o);
 @(posedge pclk_o);
 //tr_gen('b1110, 'b0100);
